@@ -1,5 +1,6 @@
 package com.tekutova.student_material_design
 
+import android.accessibilityservice.GestureDescription
 import android.hardware.camera2.params.MeteringRectangle
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -7,9 +8,13 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,14 +32,24 @@ import com.tekutova.student_material_design.data.Student
 import com.tekutova.student_material_design.data.students
 import com.tekutova.student_material_design.ui.theme.Student_Material_DesignTheme
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+
 
 
 class MainActivity : ComponentActivity() {
@@ -92,14 +107,31 @@ fun StudentItem(
     student: Student,
     modifier: Modifier = Modifier
 ) {
+    var expanded by remember { mutableStateOf(false) }
     Card(modifier = modifier) {
-        Row(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(dimensionResource(R.dimen.padding_small))
-        ) {
-            StudentIcon(student.imageResourceId)
-            StudentInformation(student.name, student.age)
+        Column(
+            modifier = Modifier
+                .animateContentSize(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                )
+        )
+        {
+            Row(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(dimensionResource(R.dimen.padding_small))
+            ) {
+                StudentIcon(student.imageResourceId)
+                StudentInformation(student.name, student.age)
+                Spacer(modifier = Modifier.weight(1f))
+                StudentItemButton(
+                    expanded = expanded,
+                    onClick = { expanded = !expanded }
+                )
+            }
         }
     }
 }
@@ -164,5 +196,42 @@ fun StudentPreview(){
 fun StudentDarkThemePriview(){
     Student_Material_DesignTheme(darkTheme = true) {
         StudentApp()
+    }
+}
+
+@Composable
+private fun StudentItemButton(
+    expanded: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+){
+    IconButton(
+        onClick = onClick,
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+            contentDescription = stringResource(R.string.expand_button_content_description),
+            tint = MaterialTheme.colorScheme.secondary
+        )
+    }
+}
+
+@Composable
+fun StudentDescription(
+    @StringRes strokeDescription: Int,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        Text(
+            text = stringResource(R.string.about),
+            style = MaterialTheme.typography.labelSmall
+        )
+        Text(
+            text = stringResource(strokeDescription),
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
 }
