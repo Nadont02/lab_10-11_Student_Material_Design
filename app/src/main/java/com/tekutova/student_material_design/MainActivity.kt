@@ -119,18 +119,30 @@ fun StudentItem(
                 )
         )
         {
-            Row(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(dimensionResource(R.dimen.padding_small))
-            ) {
-                StudentIcon(student.imageResourceId)
-                StudentInformation(student.name, student.age)
-                Spacer(modifier = Modifier.weight(1f))
-                StudentItemButton(
-                    expanded = expanded,
-                    onClick = { expanded = !expanded }
-                )
+            Column {
+                Row(
+                    modifier = modifier
+                        .fillMaxSize()
+                        .padding(dimensionResource(R.dimen.padding_small))
+                ) {
+                    StudentIcon(student.imageResourceId)
+                    StudentInformation(student.name, student.age)
+                    Spacer(modifier = Modifier.weight(1f))
+                    StudentItemButton(
+                        expanded = expanded,
+                        onClick = { expanded = !expanded }
+                    )
+                }
+                if (expanded){
+                    StudentDescription(student.description,
+                        modifier = Modifier.padding(
+                            start = dimensionResource(R.dimen.padding_medium),
+                            top = dimensionResource(R.dimen.padding_small),
+                            end = dimensionResource(R.dimen.padding_medium),
+                            bottom = dimensionResource(R.dimen.padding_medium)
+                        )
+                    )
+                }
             }
         }
     }
